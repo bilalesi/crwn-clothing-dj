@@ -7,7 +7,7 @@ import ShopPage from './pages/shop/shop.component';
 import SignInSignUpPage from './pages/signingpage/signin-signup.component';
 import Header from './components/header/header.component';
 
-import {auth} from  './firebase/firebase.utils';
+import {auth, createUserProfileDocument} from  './firebase/firebase.utils';
 
 const HatsPage = () =>{
   return(
@@ -28,10 +28,32 @@ class App extends Component {
   unsubscribeFromAuth = null;
 
   componentDidMount() {
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(user =>{
-      this.setState({currentUser : user});
-      console.log(user);
-    })
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth =>{
+      // this.setState({currentUser : user});
+      if(userAuth){
+        const userRef = await createUserProfileDocument(userAuth);
+        userRef.onSnapshot(snapshot => {
+          this.setState({
+            currentUser: {
+              id:snapshot.id,
+              ...snapshot.data()
+            }
+          }, () =>{
+            console.log('state 1: ', this.state.currentUser)
+          }
+          )
+          
+        }
+        , (err) => {
+          console.log('error',err);
+        })
+
+      }
+      else
+        this.setState({ currentUser : userAuth}, () => {
+          console.log("state 2: ",this.state);
+        })
+    });
   }
 
 
@@ -48,7 +70,9 @@ class App extends Component {
           <Route exact path='/' component={Homepage}/>
           <Route  path='/hats' component={HatsPage}/>
           <Route  path='/shop' component={ShopPage}/>
+          {console.log('state 3 :', this.state.currentUser)}
           {
+            
             this.state.currentUser ? 
               <Redirect  to='/' component={Homepage}/> :
               <Route  path='/signin' component={SignInSignUpPage}/>
