@@ -4,7 +4,7 @@ import CustumButton from '../custom-button/custom-button.component';
 
 import './sign-in.styles.scss';
 
-import {signInWithGoogle} from '../../firebase/firebase.utils';
+import {auth, signInWithGoogle} from '../../firebase/firebase.utils';
 
 class SignIn extends Component {
     constructor(props){
@@ -15,12 +15,21 @@ class SignIn extends Component {
         }
     }
 
-    handleSubmit = (event) =>{
+    handleSubmit = async (event) =>{
         event.preventDefault();
-        this.setState({
-            email:'',
-            password:''
-        })
+        const {email, password} = this.state;
+
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            this.setState({
+                email:'',
+                password:''
+            });
+        } catch (error) {
+            console.log(error);
+        }
+
+        
     }
     handleChange = (event) =>{
         const {value, name} = event.target;
@@ -37,8 +46,22 @@ class SignIn extends Component {
                 <span>Sign in with your email and password</span>
                 <form onSubmit={this.handleSubmit}>
 
-                    <FormInput name='email' type='email' value={this.state.email} required handleChange={this.handleChange} label='email'/>
-                    <FormInput name='password' type='password' value={this.state.password} required handleChange={this.handleChange} label='password'/>
+                    <FormInput 
+                        name='email' 
+                        type='email' 
+                        value={this.state.email} 
+                        required 
+                        handleChange={this.handleChange} 
+                        label='email'
+                    />
+                    <FormInput 
+                        name='password' 
+                        type='password' 
+                        value={this.state.password} 
+                        required 
+                        handleChange={this.handleChange} 
+                        label='password'
+                    />
                     <div className='buttons'>
                         <CustumButton type='submit'>Sign In</CustumButton>
                         <CustumButton onClick={signInWithGoogle} isGoogleSignIn>Sign In With Google</CustumButton>
