@@ -71,12 +71,18 @@ class App extends Component {
           <Route  path='/hats' component={HatsPage}/>
           <Route  path='/shop' component={ShopPage}/>          
           {/* <Route  path='/signin' component={SignInSignUpPage}/> */}
-          {
-            
-            this.props.currentUser ? 
-              <Redirect  to='/' component={Homepage}/> :
-              <Route  path='/signin' component={SignInSignUpPage}/>
-          }         
+          <Route 
+            exact 
+            path='/signin' 
+            render= {
+              () => 
+                // eslint-disable-next-line no-unused-expressions
+                this.props.currentUser ? 
+                (<Redirect to='/'/>)
+                :
+                (<SignInSignUpPage/>)
+              
+            }/>          
         </Switch>
       </div>
     )
