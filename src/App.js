@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState, useEffect} from 'react';
 import {Switch, Route, Redirect} from 'react-router-dom'
 import './App.css';
 import {connect} from 'react-redux';
@@ -11,48 +11,19 @@ import CheckoutPage from './pages/checkout/checkout.component';
 import SignInSignUpPage from './pages/signingpage/signin-signup.component';
 import Header from './components/header/header.component';
 import {checkUserSession} from './redux/user/user.actions'
-import {selectCollectionsForPreview} from './redux/shop/shop.selector';
 
 
-const HatsPage = () =>{
-  return(
-    <div>
-      <h1>HATS PAGE</h1>
-    </div>
-  );
-}
+const App = ({checkUserSession, currentUser}) =>{
+    const [currentUserInside, setCurrentUser] = useState('');
 
-class App extends Component {
-  constructor(){
-    super();
-    this.state= {
-      currentUserInside : ''
-    }
-  }
-  
-  unsubscribeFromAuth = null;
-
-  componentDidMount() { 
-    const {checkUserSession} = this.props;
-    checkUserSession();
-  }
-
-
-  componentWillUnmount(){
-    this.unsubscribeFromAuth();
-  }
-  
-  componentDidUpdate(prevProps, prevState){
-    console.log('state after login :', this.props);
-  }
-
-  render (){
+    useEffect(() =>{
+        checkUserSession();
+    },[checkUserSession])
     return(
       <div>
         <Header/>
         <Switch>
           <Route exact path='/' component={Homepage}/>
-          <Route  path='/hats' component={HatsPage}/>
           <Route  path='/shop' component={ShopPage}/>          
           <Route exact path='/checkout' component={CheckoutPage}/>          
           {/* <Route  path='/signin' component={SignInSignUpPage}/> */}
@@ -62,18 +33,15 @@ class App extends Component {
             render= {
               () => 
                 // eslint-disable-next-line no-unused-expressions
-                this.props.currentUser ? 
+                currentUser ? 
                 (<Redirect to='/'/>)
                 :
-                (<SignInSignUpPage/>)
-              
+                (<SignInSignUpPage/>)              
             }/>          
         </Switch>
       </div>
     )
-  } 
 }
-
 
 
 const mapStatsToProps = createStructuredSelector({
